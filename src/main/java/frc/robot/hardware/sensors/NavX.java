@@ -5,6 +5,8 @@
 package frc.robot.hardware.sensors;
 
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+
 import com.kauailabs.navx.frc.AHRS;
 
 public class NavX {
@@ -123,7 +125,7 @@ public class NavX {
     }
 
     public double getCorrectAngle() {
-        return Math.IEEEremainder(getAngle(), 360) * -1;
+        return Math.IEEEremainder(getAngleDeg(), 360) * -1;
     }
 
     /**
@@ -140,8 +142,17 @@ public class NavX {
      * 
      * @return the total angle
      */
-    public double getAngle() {
+    public double getAngleDeg() {
         return ahrs.getAngle();
+    }
+
+    /**
+     * Return a continuous rotation2D
+     * @return Rotation2d object with the current angle
+     */
+    public Rotation2d getRotation2d(){
+        new Rotation2d();
+        return Rotation2d.fromDegrees(getAngleDeg());
     }
 
     public AHRS getAhrs() {

@@ -33,21 +33,10 @@ public class ArcShooter extends SubsystemBase {
     flywheelMotor.setInverted(true);
     flywheelMotor2.follow(flywheelMotor, true);
 
-    compressor = AdvancedCompressor.get();
-
     // Set the open loop ramp rate, really should be using closed loop but that is
     // currently not important
     flywheelMotor.setOpenLoopRampRate(2.5);
-  }
-
-  @Override
-  public void periodic() {
-    // Check if the shooter is running and if so automatically turn off the compressor
-    if (!isRunning()) {
-      compressor.runUntilFull();
-    } else {
-      compressor.stopCompressor();
-    }
+    AdvancedCompressor.get().stopCompressor();
   }
 
   /**

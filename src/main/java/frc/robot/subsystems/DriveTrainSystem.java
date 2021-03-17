@@ -10,9 +10,13 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.hardware.sensors.NavX;
 
 public class DriveTrainSystem extends SubsystemBase {
 
@@ -22,6 +26,10 @@ public class DriveTrainSystem extends SubsystemBase {
 
   // Local instance of the Differential Drive class
   private DifferentialDrive diffDrive;
+
+  private final NavX navX = NavX.get();
+
+  private final DifferentialDriveOdometry m_odometry;
 
   // Create variables for the through bore encoders on either side of the drive
   // train
@@ -47,8 +55,56 @@ public class DriveTrainSystem extends SubsystemBase {
     // Constructs the motors and adds them to speed controller groups
     createMotors();
 
-    // Constructs the encoders
+    // Constructs the encoders and then resets them
     createEncoders();
+
+    m_odometry = new DifferentialDriveOdometry(navX.getRotation2d());
+  }
+
+  @Override
+  public void periodic() {
+    //Update the odometry information each loop
+    m_odometry.update(navX.getRotation2d(), getLeftEncoderDistance(), getRightEncoderDistance());
+  }
+
+  /**
+   * Get the robots current field pose
+   * @return pose information about the robot
+   */
+  public Pose2d getPose(){
+    return m_odometry.getPoseMeters();
+  }
+
+  /**
+   * Get the wheel speeds of the differential drive train
+   * @return wheel speeds in m/s
+   */
+  public DifferentialDriveWheelSpeeds getWheelSpeeds(){
+    return new DifferentialDriveWheelSpeeds(getLeftRate(), getRightRate());
+  }
+
+  public void tankDriveVolts(double leftVolts, double rightVolts){
+    leftSide.setVoltage(leftVolts);
+    rightSide.setVoltage(-rightVolts);
+    diffDrive.feed();
+  }
+  
+  /**
+   * Get the average distance of the two encoders
+   * @return the average of the two encoder readings
+   */
+  public double getAverageEncoderDistance(){
+    return (getLeftEncoderDistance() + getRightEncoderDistance()) / 2.0;
+  }
+
+  /**
+   * Resets the odometry to the specified pose.
+   *
+   * @param pose The pose to which to set the odometry.
+   */
+  public void resetOdometry(Pose2d pose){
+    resetEncoders();
+    m_odometry.resetPosition(pose, navX.getRotation2d());
   }
 
   /**
@@ -110,13 +166,15 @@ public class DriveTrainSystem extends SubsystemBase {
     // Convert the pulses into usable distances
     leftSideEncoder.setDistancePerPulse(Constants.kEncoderDistancePerPulse);
     rightSideEncoder.setDistancePerPulse(Constants.kEncoderDistancePerPulse);
+
+    resetEncoders();
   }
 
   /**
    * Wrapper for the differential drive arcade drive
    */
   public void arcadeDrive(double drivePower, double turnPower) {
-    diffDrive.arcadeDrive(-drivePower, -turnPower);
+    diffDrive.arcadeDrive(-turnPower, drivePower);
   }
 
   /**
@@ -151,6 +209,38 @@ public class DriveTrainSystem extends SubsystemBase {
   }
 
   /**
+   * Get the encoder values of the left side converted to meters
+   * @return distance driven
+   */
+  public double getLeftEncoderDistance(){
+    return leftSideEncoder.getDistance();
+  }
+
+  /**
+   * Get the encoder values of the right side converted to meters
+   * @return distance driven
+   */
+  public double getRightEncoderDistance(){
+    return rightSideEncoder.getDistance();
+  }
+
+  /**
+   * Get the rate of the left side encoders
+   * @return rate in m/s
+   */
+  public double getLeftRate(){
+    return leftSideEncoder.getRate();
+  }
+
+  /**
+   * Get the rate of the right side encoders
+   * @return rate in m/s
+   */
+  public double getRightRate(){
+    return rightSideEncoder.getRate();
+  }
+
+  /**
    * Wrapper for the tank drive method in the diff drive class
    */
   public void tankDrive(double leftPower, double rightPower) {
@@ -177,60 +267,60 @@ public class DriveTrainSystem extends SubsystemBase {
   }
 
   /**
-   * Get the value from the left side encoder
-   */
-  public int getLeftSideEncoderPosition() {
-    return leftSideEncoder.get();
-  }
-
-  /**
-   * Get a reference to the encoder on the left side
-   * 
-   * @return leftSideEncoder
-   */
-  public Encoder getLeftSideEncoder() {
-    return leftSideEncoder;
-  }
-
-  /**
-   * Get a reference to the encoder on the right side
-   * 
-   * @return rightSideEncoder
-   */
-  public Encoder getRightSideEncoder() {
-    return rightSideEncoder;
-  }
-
-  /**
-   * Get the value from the right side encoder
-   */
-  public int getRightSideEncoderPosition() {
-    return rightSideEncoder.get();
-  }
-
-  /**
-   * Gets the average position between the two sides
-   * 
-   * @return the averaged position
-   */
-  public int getAveragePosition() {
-    return ((getLeftSideEncoderPosition() + getRightSideEncoderPosition()) / 2);
-  }
-
-  /**
-   * The average distance traveled between both encoders
-   * 
-   * @return the distance
-   */
-  public double getAverageEncoderDistance() {
-    return ((leftSideEncoder.getDistance() + rightSideEncoder.getDistance()) / 2.0);
-  }
-
-  /**
    * Reset both sides encoders
    */
   public void resetEncoders() {
     rightSideEncoder.reset();
     leftSideEncoder.reset();
+  }
+
+  /**
+   * Get a reference to the left encoder object
+   * @return the left encoder object
+   */
+  public Encoder getLeftEncoder(){
+    return leftSideEncoder;
+  }
+
+  /**
+   * Get a reference to the right encoder object
+   * @return the right encoder object
+   */
+  public Encoder getRightEncoder(){
+    return rightSideEncoder;
+  }
+
+  /**
+   * Sets the max output of the drive.  Useful for scaling the drive to drive more slowly.
+   *
+   * @param maxOutput the maximum output to which the drive will be constrained
+   */
+  public void setMaxOutput(double maxOutput) {
+    diffDrive.setMaxOutput(maxOutput);
+  }
+
+   /**
+   * Zeroes the heading of the robot.
+   */
+  public void zeroHeading() {
+    navX.reset();
+  }
+
+  /**
+   * Returns the heading of the robot.
+   *
+   * @return the robot's heading in degrees, from -180 to 180
+   */
+  public double getHeading() {
+    return navX.getRotation2d().getDegrees();
+  }
+
+   /**
+   * Returns the turn rate of the robot.
+   *
+   * @return The turn rate of the robot, in degrees per second
+   */
+  public double getTurnRate() {
+    return -navX.getRate();
   }
 }
