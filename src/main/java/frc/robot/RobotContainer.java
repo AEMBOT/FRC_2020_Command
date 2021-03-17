@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import frc.robot.commands.RamseteCommandWrapper;
 import frc.robot.subsystems.ArcShooter;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveTrainSystem;
@@ -128,52 +129,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
-      new SimpleMotorFeedforward(
-        kSVolts, 
-        kvVoltMetersPerSecond, 
-        kaVoltMetersPerSecondSquared), 
-      kDriveKinematics, 
-      10);
-
-    TrajectoryConfig config = new TrajectoryConfig(kMaxVelocityMetersPerSecond, kMaxAccelerationMetersPerSecondSquared)
-      // Obey max speed
-      .setKinematics(kDriveKinematics)
-      // Apply the voltage constraint 
-      .addConstraint(autoVoltageConstraint);
-
-    // Create a test trajectory to get the tuning correct
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-      new Pose2d(0, 0, new Rotation2d(0)), 
-      List.of(
-        new Translation2d(1,1),
-        new Translation2d(2, -1)
-      ), 
-      new Pose2d(3, 0, new Rotation2d(0)), 
-      config
-    );
-
-    // Create the ramsete command that will run the trajectory
-    RamseteCommand ramseteCommand = new RamseteCommand(
-      exampleTrajectory,
-      m_driveTrain::getPose,
-      new RamseteController(kRamseteB, kRamseteZeta),
-      new SimpleMotorFeedforward(kSVolts,
-                                 kvVoltMetersPerSecond,
-                                 kaVoltMetersPerSecondSquared),
-      kDriveKinematics,
-      m_driveTrain::getWheelSpeeds,
-      new PIDController(kPDriveVal, 0, 0),
-      new PIDController(kPDriveVal, 0, 0),
-      m_driveTrain::tankDriveVolts,
-      m_driveTrain
-    );
-
-    // Reset the odometry pod to the initial pose of the trajectory
-    m_driveTrain.resetOdometry(exampleTrajectory.getInitialPose());
-
-    // Run the constructed RAMSETE command and when it's done stop the drive train by sending 0 volts to the motors
-    return ramseteCommand.andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
-    
+    // Initial Pose of 0,0 and the end pose is 1 meter up and facing the opposite direction
+    return new RamseteCommandWrapper(m_driveTrain, Paths.getBarrelPoints(), new Pose2d(1, 2, new Rotation2d(0)), new Pose2d(1, 2.7, Rotation2d.fromDegrees(180))).andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
   }
 }
