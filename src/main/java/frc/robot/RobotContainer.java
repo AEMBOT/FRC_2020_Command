@@ -130,6 +130,31 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // Initial Pose of 0,0 and the end pose is 1 meter up and facing the opposite direction
-    return new RamseteCommandWrapper(m_driveTrain, Paths.getBarrelPoints(), new Pose2d(1, 2, new Rotation2d(0)), new Pose2d(1, 2.7, Rotation2d.fromDegrees(180))).andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
+    return new RamseteCommandWrapper(
+      m_driveTrain, 
+      Paths.getBarrelPoints(), 
+      new Pose2d(0.76886, -2.52096, new Rotation2d(0)),
+      new Pose2d(0.91970, -1.86537, Rotation2d.fromDegrees(180)))
+      .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
+
+    // Bounce
+    /*
+    return new RamseteCommandWrapper(
+      m_driveTrain, 
+      Paths.getBouncePoints(), 
+      new Pose2d(1.23879, -2.28890, new Rotation2d(0)),
+      new Pose2d(8.357457973291437, -2.3817277176868688, new Rotation2d(0)))
+      .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
+    */
+
+    // Slalom
+    /*
+    return new RamseteCommandWrapper(
+      m_driveTrain, 
+      Paths.getSlalomPoints(), 
+      new Pose2d(1.28521, -3.93077, new Rotation2d(0)),
+      new Pose2d(0.60641, -2.15546, Rotation2d.fromDegrees(180)))
+      .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
+    */
   }
 }
