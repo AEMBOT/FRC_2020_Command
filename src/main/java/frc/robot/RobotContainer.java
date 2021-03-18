@@ -68,7 +68,7 @@ public class RobotContainer {
     // If no other command is using the drive train subsystem allow it to be
     // controllable with the joysticks
     m_driveTrain.setDefaultCommand(new RunCommand(
-        () -> m_driveTrain.arcadeDrive(primaryController.getY(Hand.kLeft), primaryController.getX(Hand.kRight)),
+        () -> m_driveTrain.arcadeDrive(primaryController.getY(Hand.kLeft), primaryController.getX(Hand.kRight), true),
         m_driveTrain));
 
     // Set the default command for the climber to be controlling the winch motors

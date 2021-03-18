@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -50,6 +51,8 @@ public class DriveTrainSystem extends SubsystemBase {
 
   private CANSparkMax[] rightMotorsArray;
 
+  SlewRateLimiter driveRamp = new SlewRateLimiter(0.75);
+
   /** Creates a new DriveTrainSystem. */
   public DriveTrainSystem() {
     // Constructs the motors and adds them to speed controller groups
@@ -83,6 +86,11 @@ public class DriveTrainSystem extends SubsystemBase {
     return new DifferentialDriveWheelSpeeds(getLeftRate(), getRightRate());
   }
 
+  /**
+   * Command the robots drive train using voltage as opposed to duty cycle
+   * @param leftVolts voltage to supply to the left side of the drive train
+   * @param rightVolts voltage to supply to the right side of the drive train
+   */
   public void tankDriveVolts(double leftVolts, double rightVolts){
     leftSide.setVoltage(leftVolts);
     rightSide.setVoltage(-rightVolts);
@@ -140,12 +148,7 @@ public class DriveTrainSystem extends SubsystemBase {
     leftSide = new SpeedControllerGroup(LeftFrontMotor, LeftMiddleMotor, LeftBackMotor);
     rightSide = new SpeedControllerGroup(RightFrontMotor, RightMiddleMotor, RightBackMotor);
 
-    // Flip the forward direction of the drive train
-    leftSide.setInverted(true);
-
-    // Create the differential robot control system
-    // NOTE: Right and Left are flipped to account for weird inverted values that I
-    // dont want to change because autonmous works
+    // Diff drive 
     diffDrive = new DifferentialDrive(leftSide, rightSide);
 
     diffDrive.setSafetyEnabled(false);
@@ -161,7 +164,7 @@ public class DriveTrainSystem extends SubsystemBase {
     rightSideEncoder = new Encoder(RobotMap.RightSideEncoderA, RobotMap.RightSideEncoderB);
 
     // Flip Encoder values
-    leftSideEncoder.setReverseDirection(true);
+    rightSideEncoder.setReverseDirection(true);
 
     // Convert the pulses into usable distances
     leftSideEncoder.setDistancePerPulse(Constants.kEncoderDistancePerPulse);
@@ -172,40 +175,15 @@ public class DriveTrainSystem extends SubsystemBase {
 
   /**
    * Wrapper for the differential drive arcade drive
+   * @param drivePower power to supply to the drive train to move forward/backwards
+   * @param turnPower power to supply to the drive train to rotate the robot
+   * @param enableRateLimiters enables the rate limiter on the drive for smoother acceleration and less jerk
    */
-  public void arcadeDrive(double drivePower, double turnPower) {
-    diffDrive.arcadeDrive(-turnPower, drivePower);
-  }
-
-  /**
-   * Sets the ramp rate to zero seconds
-   */
-  public void disableOpenRampRate() {
-    LeftFrontMotor.setOpenLoopRampRate(0);
-    LeftMiddleMotor.setOpenLoopRampRate(0);
-    LeftBackMotor.setOpenLoopRampRate(0);
-
-    RightBackMotor.setOpenLoopRampRate(0);
-    RightMiddleMotor.setOpenLoopRampRate(0);
-    RightFrontMotor.setOpenLoopRampRate(0);
-  }
-
-  /**
-   * Set the ramp rate on the drive train
-   * 
-   * @param accelTime the time in seconds it takes to go from 0-100
-   */
-  public void enableOpenRampRate(double accelTime) {
-
-    // Left Ramp Rate
-    LeftFrontMotor.setOpenLoopRampRate(accelTime);
-    LeftMiddleMotor.setOpenLoopRampRate(accelTime);
-    LeftBackMotor.setOpenLoopRampRate(accelTime);
-
-    // Right Ramp Rate
-    RightBackMotor.setOpenLoopRampRate(accelTime);
-    RightMiddleMotor.setOpenLoopRampRate(accelTime);
-    RightFrontMotor.setOpenLoopRampRate(accelTime);
+  public void arcadeDrive(double drivePower, double turnPower, boolean enableRateLimiters) {
+    if(enableRateLimiters)
+      diffDrive.arcadeDrive(driveRamp.calculate(drivePower), turnPower);
+    else
+      diffDrive.arcadeDrive(drivePower, turnPower);
   }
 
   /**
