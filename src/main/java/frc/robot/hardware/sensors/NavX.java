@@ -6,10 +6,11 @@ package frc.robot.hardware.sensors;
 
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.kauailabs.navx.frc.AHRS;
 
-public class NavX {
+public class NavX{
     public static NavX instance;
 
     private AHRS ahrs;

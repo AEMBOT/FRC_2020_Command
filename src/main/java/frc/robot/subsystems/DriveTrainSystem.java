@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -113,6 +114,16 @@ public class DriveTrainSystem extends SubsystemBase {
   public void resetOdometry(Pose2d pose){
     resetEncoders();
     m_odometry.resetPosition(pose, navX.getRotation2d());
+  }
+
+  /**
+   * Set the brake mode of all the motors on the bot
+   */
+  public void setBrakeMode(IdleMode mode){
+    for(int i=0; i < leftMotorsArray.length; i++){
+      leftMotorsArray[i].setIdleMode(mode);
+      rightMotorsArray[i].setIdleMode(mode);
+    }
   }
 
   /**

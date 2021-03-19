@@ -21,6 +21,8 @@ import static frc.robot.Constants.*;
 
 import java.util.List;
 
+import com.revrobotics.CANSparkMax.IdleMode;
+
 public class RamseteCommandWrapper extends CommandBase {
 
   private final DriveTrainSystem m_drive;
@@ -51,6 +53,7 @@ public class RamseteCommandWrapper extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_drive.setBrakeMode(IdleMode.kBrake);
     // Create the ramsete command that will run the trajectory
     ramseteCommand = new RamseteCommand(
       trajectory,
@@ -70,10 +73,17 @@ public class RamseteCommandWrapper extends CommandBase {
     // Reset the odometry pod to the initial pose of the trajectory
     m_drive.resetOdometry(trajectory.getInitialPose());
   }
+  
+  @Override
+  public void end(boolean interrupted) {
+    // When the auto path is over set the drive mode back to coast
+    m_drive.setBrakeMode(IdleMode.kCoast);
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    
     return ramseteCommand.isFinished();
   }
 }

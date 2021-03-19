@@ -28,7 +28,10 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import frc.robot.commands.LimelightAlignment;
 import frc.robot.commands.RamseteCommandWrapper;
+import frc.robot.hardware.sensors.NavX;
+import frc.robot.hardware.vision.Limelight;
 import frc.robot.subsystems.ArcShooter;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveTrainSystem;
@@ -47,16 +50,25 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ArcShooter m_arcShooter = new ArcShooter();
 
+  // Get the static instance of the navX
+  private final NavX m_navX = NavX.get();
+
   // Hopper general subsystems
   private final Hopper m_hopperSubsystem = new Hopper();
   private final Indexer m_indexerSubsystem = new Indexer();
   private final Intake m_intakeSubsystem = new Intake();
+
+  private final Limelight m_limelight = new Limelight();
 
   private final ClimberSubsystem m_ClimberSubsystem = new ClimberSubsystem();
 
   // Drive train
   private final DriveTrainSystem m_driveTrain = new DriveTrainSystem();
 
+  // Limelight Alignment command
+  private final LimelightAlignment m_alignmentCommand = new LimelightAlignment(m_limelight, m_driveTrain, m_navX);
+
+  // Construct both controllers
   private XboxController primaryController = new XboxController(0);
   private XboxController secondaryController = new XboxController(1);
 
@@ -87,6 +99,17 @@ public class RobotContainer {
     // Run the shooter while the left bumper is held down
     new JoystickButton(primaryController, XboxController.Button.kBumperLeft.value).whileHeld(
         new StartEndCommand(() -> m_arcShooter.runShooter(1), () -> m_arcShooter.runShooter(0), m_arcShooter));
+
+    // When A is pressed start the alignment command if it is not already running if it is cancel it
+    new JoystickButton(primaryController, XboxController.Button.kA.value)
+        .whenPressed(new InstantCommand(() -> {
+          if(m_alignmentCommand.isScheduled()){
+            m_alignmentCommand.cancel();
+          }
+          else{
+            m_alignmentCommand.schedule();
+          }
+        }));
 
     // Run the indexer and the indexer belts while X is pressed
     new JoystickButton(secondaryController, XboxController.Button.kX.value).whileHeld(new StartEndCommand(() -> {

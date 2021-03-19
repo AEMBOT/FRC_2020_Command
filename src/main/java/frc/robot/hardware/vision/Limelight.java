@@ -49,12 +49,12 @@ public class Limelight extends SubsystemBase{
     }
 
     /**
-     * Gets the number 1 or 0 (true or false) if the target is visible or not
+     * Returns if the target is visible or not
      * 
      * @return the visibility of the target
      */
-    public double getValidTarget() {
-        return tv.getDouble(0.0);
+    public boolean getValidTarget() {
+        return (int)tv.getDouble(0.0) == 1;
     }
 
     /**
