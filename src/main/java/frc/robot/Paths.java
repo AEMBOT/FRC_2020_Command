@@ -124,4 +124,17 @@ public final class Paths {
 
         return waypoints;
     }
+
+    
+    /**
+     * Construct the list of waypoints to be used by the bounce run path
+     * 
+     * @return list of translation points
+     */
+    public static List<Translation2d> getTestPoints() {
+        List<Translation2d> waypoints = new ArrayList<Translation2d>();
+        waypoints.add(new Translation2d(0.5, 0));
+
+        return waypoints;
+    }
 }
