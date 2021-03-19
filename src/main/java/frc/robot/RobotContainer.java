@@ -100,7 +100,7 @@ public class RobotContainer {
     new JoystickButton(primaryController, XboxController.Button.kBumperLeft.value).whileHeld(
         new StartEndCommand(() -> m_arcShooter.runShooter(1), () -> m_arcShooter.runShooter(0), m_arcShooter));
 
-    // When A is pressed start the alignment command if it is not already running if it is cancel it
+    // When A is pressed start the alignment command if it is not already running, if it is cancel it
     new JoystickButton(primaryController, XboxController.Button.kA.value)
         .whenPressed(new InstantCommand(() -> {
           if(m_alignmentCommand.isScheduled()){
@@ -112,7 +112,8 @@ public class RobotContainer {
         }));
 
     // Run the indexer and the indexer belts while X is pressed
-    new JoystickButton(secondaryController, XboxController.Button.kX.value).whileHeld(new StartEndCommand(() -> {
+    new JoystickButton(secondaryController, XboxController.Button.kX.value)
+    .whileHeld(new StartEndCommand(() -> {
       m_indexerSubsystem.runIndexers(1);
       m_hopperSubsystem.runBelts(0.75);
     }, () -> {
