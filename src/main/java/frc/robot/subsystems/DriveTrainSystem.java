@@ -159,6 +159,9 @@ public class DriveTrainSystem extends SubsystemBase {
     leftSide = new SpeedControllerGroup(LeftFrontMotor, LeftMiddleMotor, LeftBackMotor);
     rightSide = new SpeedControllerGroup(RightFrontMotor, RightMiddleMotor, RightBackMotor);
 
+    // Run the right side in the opposite direction of the normal
+    rightSide.setInverted(true);
+
     // Diff drive 
     diffDrive = new DifferentialDrive(leftSide, rightSide);
 
