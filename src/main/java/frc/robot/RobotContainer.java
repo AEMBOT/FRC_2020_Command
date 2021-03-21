@@ -80,7 +80,7 @@ public class RobotContainer {
     // If no other command is using the drive train subsystem allow it to be
     // controllable with the joysticks
     m_driveTrain.setDefaultCommand(new RunCommand(
-        () -> m_driveTrain.arcadeDrive(primaryController.getY(Hand.kLeft), primaryController.getX(Hand.kRight), true),
+        () -> m_driveTrain.arcadeDrive(-primaryController.getY(Hand.kLeft), primaryController.getX(Hand.kRight), true),
         m_driveTrain));
 
     // Set the default command for the climber to be controlling the winch motors
@@ -155,6 +155,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Test drive 1 meter forward
     // Initial Pose of 0,0 and the end pose is 1 meter up and facing the opposite direction
+  
+    
     return new RamseteCommandWrapper(
       m_driveTrain, 
       Paths.getTestPoints(), 

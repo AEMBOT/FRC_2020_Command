@@ -52,7 +52,7 @@ public class DriveTrainSystem extends SubsystemBase {
 
   private CANSparkMax[] rightMotorsArray;
 
-  SlewRateLimiter driveRamp = new SlewRateLimiter(0.75);
+  SlewRateLimiter driveRamp = new SlewRateLimiter(0.89);
 
   /** Creates a new DriveTrainSystem. */
   public DriveTrainSystem() {
