@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
@@ -69,6 +71,27 @@ public class DriveTrainSystem extends SubsystemBase {
   public void periodic() {
     //Update the odometry information each loop
     m_odometry.update(navX.getRotation2d(), getLeftEncoderDistance(), getRightEncoderDistance());
+
+    // Update the information displayed on the user dashboard
+    updateDashboard();
+  }
+
+  private void updateDashboard(){
+
+    // Add both encoders to the dashboard to keep track of speed and position
+    SmartDashboard.putData("Left-Side-Encoder", getLeftEncoder());
+    SmartDashboard.putData("Right-Side-Encoder", getRightEncoder());
+
+    // Gyro information
+    SmartDashboard.putData("Gyro", navX.getAhrs());
+
+    // Average drive train motor temperatures
+    SmartDashboard.putNumber("Left-Side-Temperature", getAverageLeftSideTemperature());
+    SmartDashboard.putNumber("Right-Side-Temperature", getAverageRightSideTemperature());
+
+    // Average drive train current draw
+    SmartDashboard.putNumber("Right-Side-Current-Draw", getAverageRightSideCurrents());
+    SmartDashboard.putNumber("Left-Side-Current-Draw", getAverageLeftSideCurrents());
   }
 
   /**
@@ -314,5 +337,53 @@ public class DriveTrainSystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return -navX.getRate();
+  }
+
+  /**
+   * Retrieve the average temperature of the left side of the drive train
+   * @return current motor temp. average
+   */
+  public double getAverageLeftSideTemperature(){
+    double sum  = 0;
+    for (CANSparkMax motor : leftMotorsArray) {
+      sum += motor.getMotorTemperature();
+    }
+    return (sum / leftMotorsArray.length);
+  }
+
+  /**
+   * Retrieve the average temperature of the right side of the drive train
+   * @return current motor temp. average
+   */
+  public double getAverageRightSideTemperature(){
+    double sum  = 0;
+    for (CANSparkMax motor : rightMotorsArray) {
+      sum += motor.getMotorTemperature();
+    }
+    return (sum / rightMotorsArray.length);
+  }
+
+  /**
+   * Retrieve the average amperage of the left side of the drive train
+   * @return current motor amp draw
+   */
+  public double getAverageLeftSideCurrents(){
+    double sum  = 0;
+    for (CANSparkMax motor : leftMotorsArray) {
+      sum += motor.getOutputCurrent();
+    }
+    return (sum / leftMotorsArray.length);
+  }
+
+  /**
+   * Retrieve the average amperage of the right side of the drive train
+   * @return current motor amp draw average
+   */
+  public double getAverageRightSideCurrents(){
+    double sum  = 0;
+    for (CANSparkMax motor : rightMotorsArray) {
+      sum += motor.getOutputCurrent();
+    }
+    return (sum / rightMotorsArray.length);
   }
 }

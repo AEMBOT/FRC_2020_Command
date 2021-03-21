@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
@@ -72,10 +74,43 @@ public class RobotContainer {
   private XboxController primaryController = new XboxController(0);
   private XboxController secondaryController = new XboxController(1);
 
+  // region Auto Commands
+
+  private final Command testRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, Paths.getTestPoints(),
+      new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(1, 0, Rotation2d.fromDegrees(0)))
+          .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
+
+  private final Command barrelRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, Paths.getBarrelPoints(),
+      new Pose2d(0.76886, -2.52096, new Rotation2d(0)), new Pose2d(0.91970, -1.86537, Rotation2d.fromDegrees(180)))
+          .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
+
+  private final Command bounceRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, Paths.getBouncePoints(),
+      new Pose2d(1.23879, -2.28890, new Rotation2d(0)),
+      new Pose2d(8.357457973291437, -2.3817277176868688, new Rotation2d(0)))
+          .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
+
+  private final Command slalomRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, Paths.getSlalomPoints(),
+      new Pose2d(1.28521, -3.93077, new Rotation2d(0)), new Pose2d(0.60641, -2.15546, Rotation2d.fromDegrees(180)))
+          .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
+
+  SendableChooser<Command> autoChooser = new SendableChooser<>();
+  // endregion
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+
+    // Set the default option to the 1 meter drive
+    autoChooser.setDefaultOption("Test Path", testRamsetePathCommand);
+
+    // Add the remaining complex paths as options
+    autoChooser.addOption("Barrel Path", barrelRamsetePathCommand);
+    autoChooser.addOption("Bounce Path", bounceRamsetePathCommand);
+    autoChooser.addOption("Slalom Path", slalomRamsetePathCommand);
+
+    // Add the auto selector to the dashboard
+    SmartDashboard.putData("Auto-Options", autoChooser);
 
     // If no other command is using the drive train subsystem allow it to be
     // controllable with the joysticks
@@ -84,8 +119,8 @@ public class RobotContainer {
         m_driveTrain));
 
     // Set the default command for the climber to be controlling the winch motors
-    m_ClimberSubsystem.setDefaultCommand(new RunCommand(() -> m_ClimberSubsystem.manualWinch(secondaryController.getY(Hand.kLeft),
-    secondaryController.getY(Hand.kRight)), m_ClimberSubsystem));
+    m_ClimberSubsystem.setDefaultCommand(new RunCommand(() -> m_ClimberSubsystem
+        .manualWinch(secondaryController.getY(Hand.kLeft), secondaryController.getY(Hand.kRight)), m_ClimberSubsystem));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -100,20 +135,18 @@ public class RobotContainer {
     new JoystickButton(primaryController, XboxController.Button.kBumperLeft.value).whileHeld(
         new StartEndCommand(() -> m_arcShooter.runShooter(1), () -> m_arcShooter.runShooter(0), m_arcShooter));
 
-    // When A is pressed start the alignment command if it is not already running, if it is cancel it
-    new JoystickButton(primaryController, XboxController.Button.kA.value)
-        .whenPressed(new InstantCommand(() -> {
-          if(m_alignmentCommand.isScheduled()){
-            m_alignmentCommand.cancel();
-          }
-          else{
-            m_alignmentCommand.schedule();
-          }
-        }));
+    // When A is pressed start the alignment command if it is not already running,
+    // if it is cancel it
+    new JoystickButton(primaryController, XboxController.Button.kA.value).whenPressed(new InstantCommand(() -> {
+      if (m_alignmentCommand.isScheduled()) {
+        m_alignmentCommand.cancel();
+      } else {
+        m_alignmentCommand.schedule();
+      }
+    }));
 
     // Run the indexer and the indexer belts while X is pressed
-    new JoystickButton(secondaryController, XboxController.Button.kX.value)
-    .whileHeld(new StartEndCommand(() -> {
+    new JoystickButton(secondaryController, XboxController.Button.kX.value).whileHeld(new StartEndCommand(() -> {
       m_indexerSubsystem.runIndexers(1);
       m_hopperSubsystem.runBelts(0.75);
     }, () -> {
@@ -153,45 +186,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Test drive 1 meter forward
-    // Initial Pose of 0,0 and the end pose is 1 meter up and facing the opposite direction
-  
-    
-    return new RamseteCommandWrapper(
-      m_driveTrain, 
-      Paths.getTestPoints(), 
-      new Pose2d(0, 0, new Rotation2d(0)),
-      new Pose2d(1, 0, Rotation2d.fromDegrees(0)))
-      .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
-
-    // Barrel
-    /*
-    return new RamseteCommandWrapper(
-      m_driveTrain, 
-      Paths.getBarrelPoints(), 
-      new Pose2d(0.76886, -2.52096, new Rotation2d(0)),
-      new Pose2d(0.91970, -1.86537, Rotation2d.fromDegrees(180)))
-      .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
-    */
-
-    // Bounce
-    /*
-    return new RamseteCommandWrapper(
-      m_driveTrain, 
-      Paths.getBouncePoints(), 
-      new Pose2d(1.23879, -2.28890, new Rotation2d(0)),
-      new Pose2d(8.357457973291437, -2.3817277176868688, new Rotation2d(0)))
-      .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
-    */
-
-    // Slalom
-    /*
-    return new RamseteCommandWrapper(
-      m_driveTrain, 
-      Paths.getSlalomPoints(), 
-      new Pose2d(1.28521, -3.93077, new Rotation2d(0)),
-      new Pose2d(0.60641, -2.15546, Rotation2d.fromDegrees(180)))
-      .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
-    */
+    return autoChooser.getSelected();
   }
 }

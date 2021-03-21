@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.pneumatics.AdvancedCompressor;
 
@@ -39,13 +40,35 @@ public class ArcShooter extends SubsystemBase {
     AdvancedCompressor.get().stopCompressor();
   }
 
+  @Override
+  public void periodic() {
+      updateDashboard();
+  }
+
+  private void updateDashboard(){
+
+    // Wether or not the fly wheel has reached full speed
+    SmartDashboard.putBoolean("Fly-Wheel-Speed-Status", isFullSpeed());
+
+    // The current flywheel speed
+    SmartDashboard.putNumber("Fly-Wheel-RPM", getFlywheelRPM());
+  }
+
   /**
    * Check if the geared up motor is at max rpm or > than 9000 rpm
    * 
    * @return status of full motor speed
    */
   public boolean isFullSpeed() {
-    return Math.abs(flywheelMotor.getEncoder().getVelocity() * 2) > 9000;
+    return Math.abs(getFlywheelRPM()) > 9000;
+  }
+
+  /**
+   * Get the current flywheel RPM
+   * @return
+   */
+  public double getFlywheelRPM(){
+    return flywheelMotor.getEncoder().getVelocity() * 2;
   }
 
   /**

@@ -204,8 +204,8 @@
             ],
             "content": {
               "_type": "ComboBox Chooser",
-              "_source0": "network_table:///SmartDashboard/Auto Options",
-              "_title": "/SmartDashboard/Auto Options"
+              "_source0": "network_table:///SmartDashboard/Auto-Options",
+              "_title": "Auto Options"
             }
           }
         }
