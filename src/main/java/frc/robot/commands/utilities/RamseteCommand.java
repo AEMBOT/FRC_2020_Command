@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.Trajectory.State;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.DriveTrainSystem;
@@ -189,7 +190,12 @@ public class RamseteCommand extends CommandBase {
 
     // Write the Real robot pose as well as the precalculate pose to a file
     try {
-        myWriter.write(getRealRobotPose().getX() + "," + getRealRobotPose().getY() + getCurrentCalculatedPose().getX() + "," + getCurrentCalculatedPose().getY() + "\n");
+        myWriter.write(
+          Units.metersToFeet(getRealRobotPose().getX()) + "," + 
+          Units.metersToFeet(getRealRobotPose().getY()) + "," +
+          Units.metersToFeet(getCurrentCalculatedPose().getX()) + "," + 
+          Units.metersToFeet(getCurrentCalculatedPose().getY()) + "\n"
+        );
     } catch (IOException e) {
         System.out.println("Failed to append real/expected values");
         e.printStackTrace();
