@@ -28,9 +28,13 @@ public class NavX{
      * once
      */
     private NavX() {
-
-        try {ahrs = new AHRS(SPI.Port.kMXP);} 
-        catch (RuntimeException ex) {}   
+        if(RobotBase.isReal()){
+            try {ahrs = new AHRS(SPI.Port.kMXP);} 
+            catch (RuntimeException ex) {}   
+        }
+        else{
+            ahrs = mock(AHRS.class);
+        }
        
         // Init the current heading to the current total
         lastHeading = getTotalAngleDeg();
@@ -52,6 +56,7 @@ public class NavX{
                 instance = new NavX();
             }
             return instance;
+    
        
     }
 
@@ -165,7 +170,7 @@ public class NavX{
     }
 
     /**
-     * Get the last cumulative heading (used in unit tests mainly)
+     * Set the last cumulative heading (used in unit tests mainly)
      * @return
      */
     public double getLastHeading(){
