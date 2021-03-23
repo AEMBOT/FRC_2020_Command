@@ -65,6 +65,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.resetOdom();
     // If auto is still running cancel it
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();

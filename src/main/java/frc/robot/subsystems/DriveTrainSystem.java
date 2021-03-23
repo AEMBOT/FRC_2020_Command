@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -54,7 +56,7 @@ public class DriveTrainSystem extends SubsystemBase {
 
   private CANSparkMax[] rightMotorsArray;
 
-  SlewRateLimiter driveRamp = new SlewRateLimiter(0.89);
+  SlewRateLimiter driveRamp = new SlewRateLimiter(1);
 
   /** Creates a new DriveTrainSystem. */
   public DriveTrainSystem() {
@@ -65,6 +67,8 @@ public class DriveTrainSystem extends SubsystemBase {
     createEncoders();
 
     m_odometry = new DifferentialDriveOdometry(navX.getRotation2d());
+    resetOdometry(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
+    
   }
 
   @Override
@@ -92,6 +96,11 @@ public class DriveTrainSystem extends SubsystemBase {
     // Average drive train current draw
     SmartDashboard.putNumber("Right-Side-Current-Draw", getAverageRightSideCurrents());
     SmartDashboard.putNumber("Left-Side-Current-Draw", getAverageLeftSideCurrents());
+  
+    SmartDashboard.putNumber("Odometry-X", getPose().getX());
+    SmartDashboard.putNumber("Odometry-Y", getPose().getY());
+
+    SmartDashboard.putNumber("NavX-Rotation", navX.getAngleDeg());
   }
 
   /**
@@ -182,9 +191,6 @@ public class DriveTrainSystem extends SubsystemBase {
     leftSide = new SpeedControllerGroup(LeftFrontMotor, LeftMiddleMotor, LeftBackMotor);
     rightSide = new SpeedControllerGroup(RightFrontMotor, RightMiddleMotor, RightBackMotor);
 
-    // Run the right side in the opposite direction of the normal
-    rightSide.setInverted(true);
-
     // Diff drive 
     diffDrive = new DifferentialDrive(leftSide, rightSide);
 
@@ -201,13 +207,17 @@ public class DriveTrainSystem extends SubsystemBase {
     rightSideEncoder = new Encoder(RobotMap.RightSideEncoderA, RobotMap.RightSideEncoderB);
 
     // Flip Encoder values
-    rightSideEncoder.setReverseDirection(true);
+    leftSideEncoder.setReverseDirection(true);
 
     // Convert the pulses into usable distances
     leftSideEncoder.setDistancePerPulse(Constants.kEncoderDistancePerPulse);
     rightSideEncoder.setDistancePerPulse(Constants.kEncoderDistancePerPulse);
 
     resetEncoders();
+  }
+
+  public void resetNavX(){
+    navX.reset();
   }
 
   /**

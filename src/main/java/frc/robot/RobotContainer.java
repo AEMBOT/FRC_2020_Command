@@ -77,7 +77,7 @@ public class RobotContainer {
   // region Auto Commands
 
   private final Command testRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, Paths.getTestPoints(),
-      new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(1, 0, Rotation2d.fromDegrees(0)))
+      new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(4, 0, Rotation2d.fromDegrees(0)))
           .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
 
   private final Command barrelRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, Paths.getBarrelPoints(),
@@ -124,6 +124,10 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+  }
+
+  public void resetOdom(){
+    m_driveTrain.resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
   }
 
   /**

@@ -133,7 +133,7 @@ public final class Paths {
      */
     public static List<Translation2d> getTestPoints() {
         List<Translation2d> waypoints = new ArrayList<Translation2d>();
-        waypoints.add(new Translation2d(0.5, 0));
+        waypoints.add(new Translation2d(1, 0));
 
         return waypoints;
     }

@@ -69,9 +69,12 @@ public class RamseteCommandWrapper extends CommandBase {
       m_drive::tankDriveVolts,
       m_drive
     );
-
+    
+    
+    m_drive.resetNavX();
     // Reset the odometry pod to the initial pose of the trajectory
     m_drive.resetOdometry(trajectory.getInitialPose());
+    ramseteCommand.schedule();
   }
   
   @Override
