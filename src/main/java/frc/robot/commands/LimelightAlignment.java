@@ -65,7 +65,7 @@ public class LimelightAlignment extends CommandBase {
     else{
       
       // Set the goal of the profile by adding the offset be that positive or negative to get the goal gyro angle
-      profileGoal = m_navX.getAngleDeg() + m_limelight.getX();
+      profileGoal = m_navX.getAngle() + m_limelight.getX();
       m_controller.setGoal(profileGoal);
 
     }
@@ -76,7 +76,7 @@ public class LimelightAlignment extends CommandBase {
   public void execute() {
     // If at the final goal end the command, if not try to feed data to make it reach that goal
     if(!m_controller.atGoal()){
-      m_drive.arcadeDrive(0, m_controller.calculate(m_navX.getAngleDeg()), false);
+      m_drive.arcadeDrive(0, m_controller.calculate(m_navX.getAngle()), false);
     }
     else{
       finished = true;

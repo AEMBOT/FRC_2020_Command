@@ -4,9 +4,11 @@
 
 package frc.robot.hardware.sensors;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static org.mockito.Mockito.mock;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -15,25 +17,42 @@ public class NavX{
 
     private AHRS ahrs;
 
+    // Keeps track of the current running heading
+    private double lastHeading;
+
+    // Running heading accounting for sign
+    private double runningHeading;
+
     /**
      * Creates a private constructor so that this class cannot be created more than
      * once
      */
     private NavX() {
-        try {
-            ahrs = new AHRS(SPI.Port.kMXP);
-        } catch (RuntimeException ex) {
-        }
+
+        try {ahrs = new AHRS(SPI.Port.kMXP);} 
+        catch (RuntimeException ex) {}   
+       
+        // Init the current heading to the current total
+        lastHeading = getTotalAngleDeg();
+    }
+
+    /**
+     * Mainly used in test cases and to reset the navX heading
+     */
+    public void resetLastHeading(){
+        lastHeading = getTotalAngleDeg();
     }
 
     /**
      * Creates a global reference to the singular NavX
      */
     public static NavX get() {
-        if (instance == null) {
-            instance = new NavX();
-        }
-        return instance;
+        
+            if (instance == null) {
+                instance = new NavX();
+            }
+            return instance;
+       
     }
 
     /**
@@ -125,8 +144,32 @@ public class NavX{
         return ahrs.isCalibrating();
     }
 
-    public double getCorrectAngle() {
-        return Math.IEEEremainder(getAngleDeg(), 360) * -1;
+    /**
+     * Get the current continuous angle such that 360 passes to 361 seamlessly 
+     * 
+     * 
+     * @return
+     */
+    public double getAngle(){
+
+        // Get the current total cumulative angle
+        double currentHeading = getTotalAngleDeg();
+
+        // Find the difference between the last heading and now
+        double headingDelta = Math.abs(currentHeading - getLastHeading());
+
+        // Add the current heading difference with the sign copied from the rate of the gyro to the running heading and return that value
+        runningHeading += Math.copySign(headingDelta, getRate());
+        lastHeading = currentHeading;
+        return runningHeading;
+    }
+
+    /**
+     * Get the last cumulative heading (used in unit tests mainly)
+     * @return
+     */
+    public double getLastHeading(){
+        return lastHeading;
     }
 
     /**
@@ -143,8 +186,12 @@ public class NavX{
      * 
      * @return the total angle
      */
-    public double getAngleDeg() {
+    public double getTotalAngleDeg() {
         return ahrs.getAngle();
+    }
+
+    public double test(){
+        return getTotalAngleDeg();
     }
 
     /**
@@ -153,7 +200,7 @@ public class NavX{
      */
     public Rotation2d getRotation2d(){
         new Rotation2d();
-        return Rotation2d.fromDegrees(getAngleDeg());
+        return Rotation2d.fromDegrees(getAngle());
     }
 
     public AHRS getAhrs() {

@@ -100,7 +100,7 @@ public class DriveTrainSystem extends SubsystemBase {
     SmartDashboard.putNumber("Odometry-X", getPose().getX());
     SmartDashboard.putNumber("Odometry-Y", getPose().getY());
 
-    SmartDashboard.putNumber("NavX-Rotation", navX.getAngleDeg());
+    SmartDashboard.putNumber("NavX-Rotation", navX.getAngle());
   }
 
   /**
