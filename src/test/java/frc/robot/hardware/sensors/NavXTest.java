@@ -30,7 +30,7 @@ public class NavXTest {
         // Run through each of the test cases feeding in our data in place of the Total angle, current rate and last angle
         for (NavXTestCases testCase : testCases) {
             
-            Mockito.when(navX.getTotalAngleDeg()).thenReturn(testCase.currentAngle);
+            Mockito.when(navX.getAngle()).thenReturn(testCase.currentAngle);
             Mockito.when(navX.getRate()).thenReturn(testCase.currentRate);
             Mockito.when(navX.getLastHeading()).thenReturn(testCase.lastAngle);
 

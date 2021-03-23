@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.utilities.RamseteCommand;
+import frc.robot.hardware.sensors.NavX;
 import frc.robot.subsystems.DriveTrainSystem;
 
 import static frc.robot.Constants.*;
@@ -34,6 +35,7 @@ public class RamseteCommandWrapper extends CommandBase {
   /** Creates a new RamsetCommand. */
   public RamseteCommandWrapper(DriveTrainSystem subsystem, List<Translation2d> waypoints, Pose2d initalPose, Pose2d finalPose) {
     m_drive = subsystem;
+    
 
     // Create voltage constraints
     var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
@@ -53,6 +55,7 @@ public class RamseteCommandWrapper extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    NavX.get().resetLastHeading();
     m_drive.setBrakeMode(IdleMode.kBrake);
     // Create the ramsete command that will run the trajectory
     ramseteCommand = new RamseteCommand(

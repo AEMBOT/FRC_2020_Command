@@ -66,7 +66,7 @@ public class DriveTrainSystem extends SubsystemBase {
     // Constructs the encoders and then resets them
     createEncoders();
 
-    m_odometry = new DifferentialDriveOdometry(navX.getRotation2d());
+    m_odometry = new DifferentialDriveOdometry(getHeading());
     resetOdometry(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
     
   }
@@ -74,7 +74,7 @@ public class DriveTrainSystem extends SubsystemBase {
   @Override
   public void periodic() {
     //Update the odometry information each loop
-    m_odometry.update(navX.getRotation2d(), getLeftEncoderDistance(), getRightEncoderDistance());
+    m_odometry.update(getHeading(), getLeftEncoderDistance(), getRightEncoderDistance());
 
     // Update the information displayed on the user dashboard
     updateDashboard();
@@ -145,7 +145,7 @@ public class DriveTrainSystem extends SubsystemBase {
    */
   public void resetOdometry(Pose2d pose){
     resetEncoders();
-    m_odometry.resetPosition(pose, navX.getRotation2d());
+    m_odometry.resetPosition(pose, getHeading());
   }
 
   /**
@@ -336,8 +336,8 @@ public class DriveTrainSystem extends SubsystemBase {
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
-  public double getHeading() {
-    return navX.getRotation2d().getDegrees();
+  public Rotation2d getHeading() {
+    return Rotation2d.fromDegrees(Math.IEEEremainder(navX.getAngle(), 360) * (Constants.kGyroReversed ? -1.0 : 1.0));
   }
 
    /**

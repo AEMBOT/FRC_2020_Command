@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.hardware.sensors.NavX;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -65,7 +66,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    m_robotContainer.resetOdom();
+    NavX.get().resetLastHeading();
     // If auto is still running cancel it
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();

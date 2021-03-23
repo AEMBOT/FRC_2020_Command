@@ -37,14 +37,14 @@ public class NavX{
         }
        
         // Init the current heading to the current total
-        lastHeading = getTotalAngleDeg();
+        lastHeading = getAngle();
     }
 
     /**
      * Mainly used in test cases and to reset the navX heading
      */
     public void resetLastHeading(){
-        lastHeading = getTotalAngleDeg();
+        lastHeading = getAngle();
     }
 
     /**
@@ -155,16 +155,17 @@ public class NavX{
      * 
      * @return
      */
-    public double getAngle(){
+    public double getAngleWeird(){
 
         // Get the current total cumulative angle
-        double currentHeading = getTotalAngleDeg();
+        double currentHeading = getAngle();
+        double currentRate = getRate();
 
         // Find the difference between the last heading and now
         double headingDelta = Math.abs(currentHeading - getLastHeading());
 
         // Add the current heading difference with the sign copied from the rate of the gyro to the running heading and return that value
-        runningHeading += Math.copySign(headingDelta, getRate());
+        runningHeading += Math.copySign(headingDelta, currentRate);
         lastHeading = currentHeading;
         return runningHeading;
     }
@@ -191,12 +192,8 @@ public class NavX{
      * 
      * @return the total angle
      */
-    public double getTotalAngleDeg() {
+    public double getAngle() {
         return ahrs.getAngle();
-    }
-
-    public double test(){
-        return getTotalAngleDeg();
     }
 
     /**
