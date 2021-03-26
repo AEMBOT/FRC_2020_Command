@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.Map;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -23,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
 import frc.robot.hardware.sensors.NavX;
+import frc.robot.shuffleboard.WaypointData;
 
 public class DriveTrainSystem extends SubsystemBase {
 
@@ -56,7 +59,8 @@ public class DriveTrainSystem extends SubsystemBase {
 
   private CANSparkMax[] rightMotorsArray;
 
-  SlewRateLimiter driveRamp = new SlewRateLimiter(1);
+  // Allows the driver to ramp the drivetrain up to 1.2 duty cycle in one second
+  SlewRateLimiter driveRamp = new SlewRateLimiter(1.2);
 
   /** Creates a new DriveTrainSystem. */
   public DriveTrainSystem() {
@@ -69,6 +73,7 @@ public class DriveTrainSystem extends SubsystemBase {
     m_odometry = new DifferentialDriveOdometry(getHeading());
     resetOdometry(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
     
+    SmartDashboard.putData("Test-Waypoint", new WaypointData(0, 2, false));
   }
 
   @Override
@@ -101,6 +106,10 @@ public class DriveTrainSystem extends SubsystemBase {
     SmartDashboard.putNumber("Odometry-Y", getPose().getY());
 
     SmartDashboard.putNumber("NavX-Rotation", navX.getAngle());
+
+    
+
+    
   }
 
   /**
@@ -218,6 +227,7 @@ public class DriveTrainSystem extends SubsystemBase {
 
   public void resetNavX(){
     navX.reset();
+    navX.resetYaw();
   }
 
   /**

@@ -51,6 +51,7 @@ public class RamseteCommandWrapper extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    
     NavX.get().resetLastHeading();
     m_drive.setBrakeMode(IdleMode.kBrake);
     // Create the ramsete command that will run the trajectory
