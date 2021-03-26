@@ -76,21 +76,16 @@ public class RobotContainer {
 
   // region Auto Commands
 
-  private final Command testRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, Paths.getTestPoints(),
-      new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(4, 0, Rotation2d.fromDegrees(0)))
+  private final Command testRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, "TestPath")
           .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
 
-  private final Command barrelRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, Paths.getBarrelPoints(),
-      new Pose2d(0.76886, -2.52096, new Rotation2d(0)), new Pose2d(0.91970, -1.86537, Rotation2d.fromDegrees(180)))
+  private final Command barrelRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, "BarrelPath")
           .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
 
-  private final Command bounceRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, Paths.getBouncePoints(),
-      new Pose2d(1.23879, -2.28890, new Rotation2d(0)),
-      new Pose2d(8.357457973291437, -2.3817277176868688, new Rotation2d(0)))
+  private final Command bounceRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, "BouncePath")
           .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
 
-  private final Command slalomRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, Paths.getSlalomPoints(),
-      new Pose2d(1.28521, -3.93077, new Rotation2d(0)), new Pose2d(0.60641, -2.15546, Rotation2d.fromDegrees(180)))
+  private final Command slalomRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, "SlalomPath")
           .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
 
   SendableChooser<Command> autoChooser = new SendableChooser<>();

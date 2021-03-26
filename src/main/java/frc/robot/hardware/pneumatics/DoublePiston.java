@@ -26,6 +26,13 @@ public class DoublePiston {
   }
 
   /**
+   * Toggle the status of the solenoid
+   */
+  public void toggle(){
+    solenoidPiston.toggle();
+  }
+
+  /**
    * Retract the piston
    */
   public void retract(){

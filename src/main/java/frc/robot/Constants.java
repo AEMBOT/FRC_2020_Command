@@ -49,8 +49,8 @@ public final class Constants {
 
     // Sets values for the speed at which we will reach the max velocity and what
     // the max velocity
-    public static final double kMaxVelocityMetersPerSecond = 0.5;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+    public static final double kMaxVelocityMetersPerSecond = 3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 2;
 
     // Reasonable baseline values for a RAMSETE follower in units of meters and
     // seconds
