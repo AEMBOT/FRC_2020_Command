@@ -106,9 +106,10 @@ public class DriveTrainSystem extends SubsystemBase {
     SmartDashboard.putNumber("Odometry-X", getPose().getX());
     SmartDashboard.putNumber("Odometry-Y", getPose().getY());
 
-    SmartDashboard.putNumber("NavX-Rotation", navX.getAngle());
-
-    
+    // Add the continuous navX heading as well as the shaved down heading that is supplied to the RAMSETE Controller to the dashboard
+    SmartDashboard.putNumber("NavX-Continuous", navX.getAngle());
+    SmartDashboard.putNumber("NavX-RAMSETE", getHeading().getDegrees());
+   
   }
 
   /**

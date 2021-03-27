@@ -256,6 +256,9 @@ public class RamseteCommand extends CommandBase {
       return currentRobotState.poseMeters;
   }
 
+  /**
+   * Get the current real robot state.
+   */
   public Pose2d getRealRobotPose(){
     return m_drive.getPose();
   }
