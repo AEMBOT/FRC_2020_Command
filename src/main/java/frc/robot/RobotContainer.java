@@ -79,6 +79,9 @@ public class RobotContainer {
 
   // region Auto Commands
 
+  private final Command testCurveRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, "TestCurve")
+          .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
+
   private final Command testRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, "TestPath")
           .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
 
@@ -103,6 +106,7 @@ public class RobotContainer {
     autoChooser.setDefaultOption("Test Path", testRamsetePathCommand);
 
     // Add the remaining complex paths as options
+    autoChooser.addOption("Test Curve Path", testCurveRamsetePathCommand);
     autoChooser.addOption("Barrel Path", barrelRamsetePathCommand);
     autoChooser.addOption("Bounce Path", bounceRamsetePathCommand);
     autoChooser.addOption("Slalom Path", slalomRamsetePathCommand);
