@@ -4,39 +4,26 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class WaypointData implements Sendable{
-    private double x, y;
-    private boolean isCalculated;
+    private double realX, realY, calculatedX, calculatedY;
+    private boolean resetChart;
     
-    public WaypointData(double x, double y, boolean isCalculated){
-        this.x = x;
-        this.y = y;
-        this.isCalculated = isCalculated;
+    public WaypointData(double realX, double realY, double calculatedX, double calculatedY, boolean resetChart){
+        this.realX = realX;
+        this.realY = realY;
+        this.calculatedX = calculatedX;
+        this.calculatedY = calculatedY;
+        this.resetChart = resetChart;
     }
 
-    public double getX() {
-        return x;
-    }
-    public boolean isCalculated() {
-        return isCalculated;
-    }
-    public void setCalculated(boolean isCalculated) {
-        this.isCalculated = isCalculated;
-    }
-    public double getY() {
-        return y;
-    }
-    public void setY(double y) {
-        this.y = y;
-    }
-    public void setX(double x) {
-        this.x = x;
-    }
 
     public void initSendable(SendableBuilder builder){
         builder.setSmartDashboardType("WaypointData");
-        builder.addDoubleProperty("x", () -> x, null);
-        builder.addDoubleProperty("y", () -> y, null);
-        builder.addBooleanProperty("isCalculated", () -> isCalculated, null);
+        builder.addDoubleProperty("realX", () -> realX, null);
+        builder.addDoubleProperty("realY", () -> realY, null);
+        builder.addDoubleProperty("calculatedX", () -> calculatedX, null);
+        builder.addDoubleProperty("calculatedY", () -> calculatedY, null);
+        builder.addBooleanProperty("resetChart", () -> resetChart, null);
+        
     }
 
     

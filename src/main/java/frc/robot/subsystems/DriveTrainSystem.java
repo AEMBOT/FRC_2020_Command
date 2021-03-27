@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import java.util.Map;
+import java.util.Random;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -73,7 +74,7 @@ public class DriveTrainSystem extends SubsystemBase {
     m_odometry = new DifferentialDriveOdometry(getHeading());
     resetOdometry(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
     
-    SmartDashboard.putData("Test-Waypoint", new WaypointData(0, 2, false));
+    
   }
 
   @Override
@@ -106,8 +107,6 @@ public class DriveTrainSystem extends SubsystemBase {
     SmartDashboard.putNumber("Odometry-Y", getPose().getY());
 
     SmartDashboard.putNumber("NavX-Rotation", navX.getAngle());
-
-    
 
     
   }

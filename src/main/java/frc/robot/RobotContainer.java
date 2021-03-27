@@ -7,6 +7,7 @@ package frc.robot;
 import static frc.robot.Constants.*;
 
 import java.util.List;
+import java.util.Random;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -34,6 +35,8 @@ import frc.robot.commands.LimelightAlignment;
 import frc.robot.commands.RamseteCommandWrapper;
 import frc.robot.hardware.sensors.NavX;
 import frc.robot.hardware.vision.Limelight;
+import frc.robot.shuffleboard.WaypointData;
+import frc.robot.shuffleboard.utilities.RAMSETEPlottingManager;
 import frc.robot.subsystems.ArcShooter;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveTrainSystem;
@@ -106,6 +109,20 @@ public class RobotContainer {
 
     // Add the auto selector to the dashboard
     SmartDashboard.putData("Auto-Options", autoChooser);
+
+    //region Test Buttons For Manipulating the chart plotting widget
+    // Add test data to the chart
+    SmartDashboard.putData("Add Test Point", new InstantCommand(() -> {
+      RAMSETEPlottingManager.addWaypoint(
+        new Random().nextInt(30), 
+        new Random().nextInt(15), 
+        new Random().nextInt(30), 
+        new Random().nextInt(15));
+    }));
+
+    // Clear all data off the chart
+    SmartDashboard.putData("Clear Chart", new InstantCommand(() -> RAMSETEPlottingManager.resetChart()));
+    //endregion
 
     // If no other command is using the drive train subsystem allow it to be
     // controllable with the joysticks

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.shuffleboard.utilities.RAMSETEPlottingManager;
 import frc.robot.subsystems.DriveTrainSystem;
 
 import java.io.File;
@@ -148,6 +149,10 @@ public class RamseteCommand extends CommandBase {
 
   @Override
   public void initialize() {
+
+    // Reset chart before running the RAMSETE command
+    RAMSETEPlottingManager.resetChart();
+    
     m_drive = (DriveTrainSystem)getRequirements().toArray()[0];
     try {
         // Delete the file and create a new one
@@ -159,6 +164,7 @@ public class RamseteCommand extends CommandBase {
         System.out.println("Failed to write to RAMSETE output");
         e.printStackTrace();
     }
+
     m_prevTime = -1;
     var initialState = m_trajectory.sample(0);
     m_prevSpeeds =
@@ -196,6 +202,10 @@ public class RamseteCommand extends CommandBase {
           Units.metersToFeet(getCurrentCalculatedPose().getX()) + "," + 
           Units.metersToFeet(getCurrentCalculatedPose().getY()) + "\n"
         );
+
+        // Plot the points in realtime on the RAMSETE tracker
+        RAMSETEPlottingManager.addWaypoint(getRealRobotPose().getX(), getRealRobotPose().getY(), getCurrentCalculatedPose().getX(), getCurrentCalculatedPose().getY());
+
     } catch (IOException e) {
         System.out.println("Failed to append real/expected values");
         e.printStackTrace();
