@@ -204,7 +204,7 @@ public class RamseteCommand extends CommandBase {
         );
 
         // Plot the points in realtime on the RAMSETE tracker
-        RAMSETEPlottingManager.addWaypoint(getRealRobotPose().getX(), getRealRobotPose().getY(), getCurrentCalculatedPose().getX(), getCurrentCalculatedPose().getY());
+        RAMSETEPlottingManager.addWaypoint(Units.metersToFeet(getRealRobotPose().getX()), Units.metersToFeet(getRealRobotPose().getY()), Units.metersToFeet(getCurrentCalculatedPose().getX()), Units.metersToFeet(getCurrentCalculatedPose().getY()));
 
     } catch (IOException e) {
         System.out.println("Failed to append real/expected values");

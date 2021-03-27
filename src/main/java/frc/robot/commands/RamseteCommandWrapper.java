@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConst
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.utilities.RamseteCommand;
 import frc.robot.hardware.sensors.NavX;
+import frc.robot.shuffleboard.utilities.RAMSETEPlottingManager;
 import frc.robot.subsystems.DriveTrainSystem;
 
 import static frc.robot.Constants.*;
@@ -51,7 +53,8 @@ public class RamseteCommandWrapper extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    
+    RAMSETEPlottingManager.resetChart();
+
     NavX.get().resetLastHeading();
     m_drive.setBrakeMode(IdleMode.kBrake);
     // Create the ramsete command that will run the trajectory

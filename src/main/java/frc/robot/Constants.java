@@ -31,7 +31,7 @@ public final class Constants {
     public static final double kMaxUsableVoltage = 7;
 
     // Weather or not the gyro is flipped
-    public static final boolean kGyroReversed = false;
+    public static final boolean kGyroReversed = true;
 
     // Voltage for static friction velocity and acceleration
     public static final double kSVolts = 0.232;
