@@ -15,7 +15,9 @@ public class WaypointData implements Sendable{
         this.resetChart = resetChart;
     }
 
-
+    /**
+     * Creates the properties to be used when adding a piece of new data to the dashboard
+     */
     public void initSendable(SendableBuilder builder){
         builder.setSmartDashboardType("WaypointData");
         builder.addDoubleProperty("realX", () -> realX, null);
