@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
 
@@ -34,6 +37,8 @@ public class DriveTrainSystem extends SubsystemBase {
   private SpeedControllerGroup leftSide;
   private SpeedControllerGroup rightSide;
 
+  private boolean recordMotorInputs = false;
+
   // Local instance of the Differential Drive class
   private DifferentialDrive diffDrive;
 
@@ -60,6 +65,8 @@ public class DriveTrainSystem extends SubsystemBase {
 
   private CANSparkMax[] rightMotorsArray;
 
+  private FileWriter driveTrainWriter;
+
   // Allows the driver to ramp the drivetrain up to 1.2 duty cycle in one second
   SlewRateLimiter driveRamp = new SlewRateLimiter(1.2);
 
@@ -73,22 +80,47 @@ public class DriveTrainSystem extends SubsystemBase {
 
     m_odometry = new DifferentialDriveOdometry(getHeading());
     resetOdometry(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
-    
-    
+
+    setBrakeMode(IdleMode.kBrake);
+
+    // Create a file to write the current motor powers to
+    try {
+      // Delete the file and create a new one
+      new File("/home/lvuser/DriveTrainOut.csv").delete();
+      driveTrainWriter = new FileWriter("/home/lvuser/DriveTrainOut.csv");
+      driveTrainWriter.write("Left Power,Right Power");
+
+    } catch (IOException e) {
+      System.out.println("Failed to write to Motor output");
+      e.printStackTrace();
+    }
+
   }
 
   @Override
   public void periodic() {
-    //Update the odometry information each loop
+    // Update the odometry information each loop
     m_odometry.update(getHeading(), getLeftEncoderDistance(), getRightEncoderDistance());
 
     // Update the information displayed on the user dashboard
     updateDashboard();
+
+    // If We are trying to record the current powers write them to the file
+    try {
+      if (recordMotorInputs) {
+        driveTrainWriter.write(getLeftSidePower() + ",");
+        driveTrainWriter.write(getRightSidePower() + "\n");
+      }
+    } catch (IOException exception) {
+      exception.printStackTrace();
+    }
   }
 
-  private void updateDashboard(){
 
-    // Add both encoders to the dashboard to keep track of speed and position
+  private void updateDashboard() {
+
+    // AdriveTrainWriterdd both encoders to the dashboard to keep track of speed and
+    // position
     SmartDashboard.putData("Left-Side-Encoder", getLeftEncoder());
     SmartDashboard.putData("Right-Side-Encoder", getRightEncoder());
 
@@ -102,48 +134,53 @@ public class DriveTrainSystem extends SubsystemBase {
     // Average drive train current draw
     SmartDashboard.putNumber("Right-Side-Current-Draw", getAverageRightSideCurrents());
     SmartDashboard.putNumber("Left-Side-Current-Draw", getAverageLeftSideCurrents());
-  
+
     SmartDashboard.putNumber("Odometry-X", getPose().getX());
     SmartDashboard.putNumber("Odometry-Y", getPose().getY());
 
-    // Add the continuous navX heading as well as the shaved down heading that is supplied to the RAMSETE Controller to the dashboard
+    // Add the continuous navX heading as well as the shaved down heading that is
+    // supplied to the RAMSETE Controller to the dashboard
     SmartDashboard.putNumber("NavX-Continuous", navX.getAngle());
     SmartDashboard.putNumber("NavX-RAMSETE", getHeading().getDegrees());
-   
+
   }
 
   /**
    * Get the robots current field pose
+   * 
    * @return pose information about the robot
    */
-  public Pose2d getPose(){
+  public Pose2d getPose() {
     return m_odometry.getPoseMeters();
   }
 
   /**
    * Get the wheel speeds of the differential drive train
+   * 
    * @return wheel speeds in m/s
    */
-  public DifferentialDriveWheelSpeeds getWheelSpeeds(){
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
     return new DifferentialDriveWheelSpeeds(getLeftRate(), getRightRate());
   }
 
   /**
    * Command the robots drive train using voltage as opposed to duty cycle
-   * @param leftVolts voltage to supply to the left side of the drive train
+   * 
+   * @param leftVolts  voltage to supply to the left side of the drive train
    * @param rightVolts voltage to supply to the right side of the drive train
    */
-  public void tankDriveVolts(double leftVolts, double rightVolts){
+  public void tankDriveVolts(double leftVolts, double rightVolts) {
     leftSide.setVoltage(leftVolts);
     rightSide.setVoltage(-rightVolts);
     diffDrive.feed();
   }
-  
+
   /**
    * Get the average distance of the two encoders
+   * 
    * @return the average of the two encoder readings
    */
-  public double getAverageEncoderDistance(){
+  public double getAverageEncoderDistance() {
     return (getLeftEncoderDistance() + getRightEncoderDistance()) / 2.0;
   }
 
@@ -152,7 +189,7 @@ public class DriveTrainSystem extends SubsystemBase {
    *
    * @param pose The pose to which to set the odometry.
    */
-  public void resetOdometry(Pose2d pose){
+  public void resetOdometry(Pose2d pose) {
     resetEncoders();
     m_odometry.resetPosition(pose, getHeading());
   }
@@ -160,8 +197,8 @@ public class DriveTrainSystem extends SubsystemBase {
   /**
    * Set the brake mode of all the motors on the bot
    */
-  public void setBrakeMode(IdleMode mode){
-    for(int i=0; i < leftMotorsArray.length; i++){
+  public void setBrakeMode(IdleMode mode) {
+    for (int i = 0; i < leftMotorsArray.length; i++) {
       leftMotorsArray[i].setIdleMode(mode);
       rightMotorsArray[i].setIdleMode(mode);
     }
@@ -200,7 +237,7 @@ public class DriveTrainSystem extends SubsystemBase {
     leftSide = new SpeedControllerGroup(LeftFrontMotor, LeftMiddleMotor, LeftBackMotor);
     rightSide = new SpeedControllerGroup(RightFrontMotor, RightMiddleMotor, RightBackMotor);
 
-    // Diff drive 
+    // Diff drive
     diffDrive = new DifferentialDrive(leftSide, rightSide);
 
     diffDrive.setSafetyEnabled(false);
@@ -225,19 +262,23 @@ public class DriveTrainSystem extends SubsystemBase {
     resetEncoders();
   }
 
-  public void resetNavX(){
+  public void resetNavX() {
     navX.reset();
     navX.resetYaw();
   }
 
   /**
    * Wrapper for the differential drive arcade drive
-   * @param drivePower power to supply to the drive train to move forward/backwards
-   * @param turnPower power to supply to the drive train to rotate the robot
-   * @param enableRateLimiters enables the rate limiter on the drive for smoother acceleration and less jerk
+   * 
+   * @param drivePower         power to supply to the drive train to move
+   *                           forward/backwards
+   * @param turnPower          power to supply to the drive train to rotate the
+   *                           robot
+   * @param enableRateLimiters enables the rate limiter on the drive for smoother
+   *                           acceleration and less jerk
    */
   public void arcadeDrive(double drivePower, double turnPower, boolean enableRateLimiters) {
-    if(enableRateLimiters)
+    if (enableRateLimiters)
       diffDrive.arcadeDrive(driveRamp.calculate(drivePower), turnPower);
     else
       diffDrive.arcadeDrive(drivePower, turnPower);
@@ -245,33 +286,37 @@ public class DriveTrainSystem extends SubsystemBase {
 
   /**
    * Get the encoder values of the left side converted to meters
+   * 
    * @return distance driven
    */
-  public double getLeftEncoderDistance(){
+  public double getLeftEncoderDistance() {
     return leftSideEncoder.getDistance();
   }
 
   /**
    * Get the encoder values of the right side converted to meters
+   * 
    * @return distance driven
    */
-  public double getRightEncoderDistance(){
+  public double getRightEncoderDistance() {
     return rightSideEncoder.getDistance();
   }
 
   /**
    * Get the rate of the left side encoders
+   * 
    * @return rate in m/s
    */
-  public double getLeftRate(){
+  public double getLeftRate() {
     return leftSideEncoder.getRate();
   }
 
   /**
    * Get the rate of the right side encoders
+   * 
    * @return rate in m/s
    */
-  public double getRightRate(){
+  public double getRightRate() {
     return rightSideEncoder.getRate();
   }
 
@@ -311,22 +356,25 @@ public class DriveTrainSystem extends SubsystemBase {
 
   /**
    * Get a reference to the left encoder object
+   * 
    * @return the left encoder object
    */
-  public Encoder getLeftEncoder(){
+  public Encoder getLeftEncoder() {
     return leftSideEncoder;
   }
 
   /**
    * Get a reference to the right encoder object
+   * 
    * @return the right encoder object
    */
-  public Encoder getRightEncoder(){
+  public Encoder getRightEncoder() {
     return rightSideEncoder;
   }
 
   /**
-   * Sets the max output of the drive.  Useful for scaling the drive to drive more slowly.
+   * Sets the max output of the drive. Useful for scaling the drive to drive more
+   * slowly.
    *
    * @param maxOutput the maximum output to which the drive will be constrained
    */
@@ -334,7 +382,7 @@ public class DriveTrainSystem extends SubsystemBase {
     diffDrive.setMaxOutput(maxOutput);
   }
 
-   /**
+  /**
    * Zeroes the heading of the robot.
    */
   public void zeroHeading() {
@@ -350,7 +398,7 @@ public class DriveTrainSystem extends SubsystemBase {
     return Rotation2d.fromDegrees(Math.IEEEremainder(navX.getAngle(), 360) * (Constants.kGyroReversed ? -1.0 : 1.0));
   }
 
-   /**
+  /**
    * Returns the turn rate of the robot.
    *
    * @return The turn rate of the robot, in degrees per second
@@ -361,10 +409,11 @@ public class DriveTrainSystem extends SubsystemBase {
 
   /**
    * Retrieve the average temperature of the left side of the drive train
+   * 
    * @return current motor temp. average
    */
-  public double getAverageLeftSideTemperature(){
-    double sum  = 0;
+  public double getAverageLeftSideTemperature() {
+    double sum = 0;
     for (CANSparkMax motor : leftMotorsArray) {
       sum += motor.getMotorTemperature();
     }
@@ -373,10 +422,11 @@ public class DriveTrainSystem extends SubsystemBase {
 
   /**
    * Retrieve the average temperature of the right side of the drive train
+   * 
    * @return current motor temp. average
    */
-  public double getAverageRightSideTemperature(){
-    double sum  = 0;
+  public double getAverageRightSideTemperature() {
+    double sum = 0;
     for (CANSparkMax motor : rightMotorsArray) {
       sum += motor.getMotorTemperature();
     }
@@ -385,10 +435,11 @@ public class DriveTrainSystem extends SubsystemBase {
 
   /**
    * Retrieve the average amperage of the left side of the drive train
+   * 
    * @return current motor amp draw
    */
-  public double getAverageLeftSideCurrents(){
-    double sum  = 0;
+  public double getAverageLeftSideCurrents() {
+    double sum = 0;
     for (CANSparkMax motor : leftMotorsArray) {
       sum += motor.getOutputCurrent();
     }
@@ -397,13 +448,39 @@ public class DriveTrainSystem extends SubsystemBase {
 
   /**
    * Retrieve the average amperage of the right side of the drive train
+   * 
    * @return current motor amp draw average
    */
-  public double getAverageRightSideCurrents(){
-    double sum  = 0;
+  public double getAverageRightSideCurrents() {
+    double sum = 0;
     for (CANSparkMax motor : rightMotorsArray) {
       sum += motor.getOutputCurrent();
     }
     return (sum / rightMotorsArray.length);
+  }
+
+  /**
+   * Toggle wether or not we should be recording motor inputs
+   */
+  public void toggleRecording() {
+    recordMotorInputs = !recordMotorInputs;
+  }
+
+  /**
+   * The current duty cycle supplied to the left side of the drive train
+   * 
+   * @return current power
+   */
+  public double getLeftSidePower() {
+    return getLeftSide().get();
+  }
+
+  /**
+   * The current duty cycle supplied to the right side of the drive train
+   * 
+   * @return current power
+   */
+  public double getRightSidePower() {
+    return getRightSide().get();
   }
 }

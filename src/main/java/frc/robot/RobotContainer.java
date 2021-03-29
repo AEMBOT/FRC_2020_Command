@@ -133,6 +133,9 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
+    // Toggle wether or not we should be recording drive train inputs
+    SmartDashboard.putData("Toggle-Record-Inputs", new InstantCommand(m_driveTrain::toggleRecording));
+
     // Set the default option to the 1 meter drive
     autoChooser.setDefaultOption("Test Path", testRamsetePathCommand);
 
