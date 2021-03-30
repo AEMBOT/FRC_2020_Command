@@ -28,29 +28,29 @@ public final class Constants {
     public static final double kEncoderDistancePerPulse = WHEEL_CIRCUMFERENCE / PULSES_PER_REV;
 
     // The maximum voltage the drive motors can draw during this
-    public static final double kMaxUsableVoltage = 7;
+    public static final double kMaxUsableVoltage = 10;
 
     // Weather or not the gyro is flipped
     public static final boolean kGyroReversed = true;
 
     // Voltage for static friction velocity and acceleration
-    public static final double kSVolts = 0.232;
-    public static final double kvVoltMetersPerSecond = 2.24;
-    public static final double kaVoltMetersPerSecondSquared = 0;
+    public static final double kSVolts = 0.197;
+    public static final double kvVoltMetersPerSecond = 1.6; // 1.6 is functional , 1.3 results in pretty graph, but not right position
+    public static final double kaVoltMetersPerSecondSquared = 0.329;
 
     // PID values (Only P is required for velocity)
-    public static final double kPDriveVal = 1.61;
+    public static final double kPDriveVal = 2.6;
 
     // Kinematic information about our robot
-    public static final double kTrackWidthMeters = 0.6223;
+    public static final double kTrackWidthMeters = 0.501360651651025;
     
     public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
             kTrackWidthMeters);
 
     // Sets values for the speed at which we will reach the max velocity and what
     // the max velocity
-    public static final double kMaxVelocityMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 2;
+    public static final double kMaxVelocityMetersPerSecond = 2;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
 
     // Reasonable baseline values for a RAMSETE follower in units of meters and
     // seconds

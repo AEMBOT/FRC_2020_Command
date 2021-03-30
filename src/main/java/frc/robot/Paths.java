@@ -146,6 +146,7 @@ public final class Paths {
     public static List<Translation2d> getTestCurvePoints() {
         List<Translation2d> waypoints = new ArrayList<Translation2d>();
         waypoints.add(new Translation2d(1, 0.75));
+        waypoints.add(new Translation2d(1.5, 0.97));
 
         return waypoints;
     }

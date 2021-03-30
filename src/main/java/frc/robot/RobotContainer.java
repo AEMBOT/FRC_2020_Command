@@ -79,6 +79,7 @@ public class RobotContainer {
 
   // region Auto Commands Manual Points
 
+  
     // Drive and curve 1 meter up 
     private final Command testCurveRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, Paths.getTestCurvePoints(),
     new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(2, 1, Rotation2d.fromDegrees(0)))
@@ -86,7 +87,7 @@ public class RobotContainer {
 
     // Drive 4 meters straight forward
     private final Command testRamsetePathCommand = new RamseteCommandWrapper(m_driveTrain, Paths.getTestPoints(),
-    new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(4, 0, Rotation2d.fromDegrees(0)))
+    new Pose2d(0, 0, new Rotation2d(0)), new Pose2d(1, 0, Rotation2d.fromDegrees(0)))
         .andThen(() -> m_driveTrain.tankDriveVolts(0, 0));
 
     // Follow the Barrel Path
