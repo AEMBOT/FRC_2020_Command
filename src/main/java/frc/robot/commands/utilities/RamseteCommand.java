@@ -158,7 +158,7 @@ public class RamseteCommand extends CommandBase {
         // Delete the file and create a new one
         new File("/home/lvuser/OutputData.csv").delete();
         myWriter = new FileWriter("/home/lvuser/OutputData.csv");
-        myWriter.write("Real X, Real Y, Expected X, Expected Y");
+        myWriter.write("Real X, Real Y, Expected X, Expected Y, Intended Velocity Left, Intended Velocity Right, Real Velocity Left, Real Velocity Right");
         
     } catch (IOException e) {
         System.out.println("Failed to write to RAMSETE output");
@@ -194,26 +194,32 @@ public class RamseteCommand extends CommandBase {
 
     currentRobotState = m_trajectory.sample(curTime);
 
-    // Write the Real robot pose as well as the precalculate pose to a file
-    try {
-        myWriter.write(
-          Units.metersToFeet(getRealRobotPose().getX()) + "," + 
-          Units.metersToFeet(getRealRobotPose().getY()) + "," +
-          Units.metersToFeet(getCurrentCalculatedPose().getX()) + "," + 
-          Units.metersToFeet(getCurrentCalculatedPose().getY()) + "\n"
-        );
-
-        // Plot the points in realtime on the RAMSETE tracker
-        RAMSETEPlottingManager.addWaypoint(Units.metersToFeet(getRealRobotPose().getX()), Units.metersToFeet(getRealRobotPose().getY()), Units.metersToFeet(getCurrentCalculatedPose().getX()), Units.metersToFeet(getCurrentCalculatedPose().getY()));
-
-    } catch (IOException e) {
-        System.out.println("Failed to append real/expected values");
-        e.printStackTrace();
-    }
+    
 
     var targetWheelSpeeds =
         m_kinematics.toWheelSpeeds(
             m_follower.calculate(m_pose.get(), m_trajectory.sample(curTime)));
+
+    // Write the Real robot pose as well as the precalculate pose to a file
+    try {
+      myWriter.write(
+        Units.metersToFeet(getRealRobotPose().getX()) + "," + 
+        Units.metersToFeet(getRealRobotPose().getY()) + "," +
+        Units.metersToFeet(getCurrentCalculatedPose().getX()) + "," + 
+        Units.metersToFeet(getCurrentCalculatedPose().getY()) + "," +
+        targetWheelSpeeds.leftMetersPerSecond + "," +
+        targetWheelSpeeds.rightMetersPerSecond + "," +
+        m_drive.getWheelSpeeds().leftMetersPerSecond + "," +
+        m_drive.getWheelSpeeds().rightMetersPerSecond + "\n"
+      );
+
+      // Plot the points in realtime on the RAMSETE tracker
+      RAMSETEPlottingManager.addWaypoint(Units.metersToFeet(getRealRobotPose().getX()), Units.metersToFeet(getRealRobotPose().getY()), Units.metersToFeet(getCurrentCalculatedPose().getX()), Units.metersToFeet(getCurrentCalculatedPose().getY()));
+
+  } catch (IOException e) {
+      System.out.println("Failed to append real/expected values");
+      e.printStackTrace();
+  }
 
     var leftSpeedSetpoint = targetWheelSpeeds.leftMetersPerSecond;
     var rightSpeedSetpoint = targetWheelSpeeds.rightMetersPerSecond;

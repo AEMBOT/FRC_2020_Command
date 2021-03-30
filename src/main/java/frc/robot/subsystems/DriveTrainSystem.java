@@ -204,6 +204,8 @@ public class DriveTrainSystem extends SubsystemBase {
     diffDrive = new DifferentialDrive(leftSide, rightSide);
 
     diffDrive.setSafetyEnabled(false);
+
+    setBrakeMode(IdleMode.kBrake);
   }
 
   /**

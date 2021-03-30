@@ -76,7 +76,6 @@ public class RamseteCommandWrapper extends CommandBase {
   @Override
   public void initialize() {
     RAMSETEPlottingManager.resetChart();
-    m_drive.setBrakeMode(IdleMode.kBrake);
     // Create the ramsete command that will run the trajectory
     ramseteCommand = new RamseteCommand(
       trajectory,
@@ -102,8 +101,6 @@ public class RamseteCommandWrapper extends CommandBase {
   
   @Override
   public void end(boolean interrupted) {
-    // When the auto path is over set the drive mode back to coast
-    m_drive.setBrakeMode(IdleMode.kCoast);
   }
 
   // Returns true when the command should end.
